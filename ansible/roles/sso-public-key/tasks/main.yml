@@ -1,0 +1,37 @@
+- name: Get the bearer access token
+  uri: 
+    url: "{{proto}}://{{dns_name}}/auth/realms/master/protocol/openid-connect/token"
+    method: POST
+    headers:
+      cache-control: no-cache
+      content-type: 'application/x-www-form-urlencoded'
+    body: "client_id=admin-cli&username=admin&password={{keycloak_admin_password}}&grant_type=password"
+  register: bearer_token
+   
+#- debug: 
+#    var: bearer_token.json.access_token
+
+- name: Getting the sso public key from keycloak
+  uri:
+    url: "{{proto}}://{{dns_name}}/auth/admin/realms/sunbird/keys"
+    method: GET
+    headers:
+      Authorization: Bearer {{bearer_token.json.access_token}}
+      Content-Type: 'application/json'
+      Cache-Control: no-cache
+  register: sso_public_key
+
+- set_fact:
+    dataresult: "{{sso_public_key}}"
+  register: sso_public_key
+
+#- debug:
+#    msg: "{{sso_public_key}}"
+
+#- debug:
+#    msg: "{{sso_public_key| json_query('ansible_facts.dataresult.json.keys[0].publicKey')}}"
+
+- lineinfile:
+     path: config.yml
+     regexp: '^sunbird_sso_publickey:*'
+     line: "sunbird_sso_publickey: {{sso_public_key| json_query('ansible_facts.dataresult.json.keys[0].publicKey')}}"
