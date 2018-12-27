@@ -101,6 +101,7 @@ keycloak() {
     ./deploy-keycloak-vm.sh $ansible_variable_path 
     sleep 15
     ./bootstrap-keycloak.sh $ansible_variable_path
+    ./update-sso-public-key.sh $ansible_variable_path
 }
 
 # badger
@@ -235,3 +236,5 @@ echo -e \n$(date)\n >> logs/apis.log; apis 2>&1 | tee -a logs/apis.log
 echo -e \n$(date)\n >> logs/proxies.log; proxy 2>&1 | tee -a logs/proxies.log
 echo -e \n$(date)\n >> logs/keycloak.log; keycloak 2>&1 | tee -a logs/keycloak.log
 echo -e \n$(date)\n >> logs/badger.log; badger 2>&1 | tee -a logs/badger.log
+echo -e "\n$(date)\n">>logs/core.log; core 2>&1 | tee -a logs/core.log
+echo -e "\n$(date)\n">>logs/systeminit.log; systeminit 2>&1 | tee -a logs/systeminit.log
