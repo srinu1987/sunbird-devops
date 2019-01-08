@@ -64,3 +64,10 @@
     register: result
   - shell: docker node update --availability drain $(hostname)
     when: result is skipped
+
+- name: Adding user to docker group
+  hosts: swarm-nodes:swarm-manager:swarm-worker
+  become: yes
+  tasks:
+    - shell: gpasswd -a "{{ansible_ssh_user}}" docker
+
